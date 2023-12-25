@@ -23,11 +23,11 @@ Avaliable programming languages:
 * C++ (GCC Latest)
 * PascalABC (Free Pascal 3.2.2)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 ## 👍 Contributing
-Have a look through existing Issues and Pull Requests that you could help with. 
-If you'd like to request a feature or report a bug, please create a GitHub Issue using one of the templates provided.
+If you want to add new feature or suggest better solution for some aspect of this application,
+you can always create a new [Pull Request](https://github.com/CONTESTER-reborn/driver/pulls).
+In order to get a bug you noticed fixed create a [GitHub Issue](https://github.com/CONTESTER-reborn/driver/issues) 
+and we will discuss possible solutions.
 
 
 ## 💬 Contacts
@@ -38,6 +38,4 @@ My social medias:
 
 [![telegram](https://img.shields.io/badge/-Telegram-090909?style=for-the-badge&logo=Telegram&logoColor=4F7DB3)](https://t.me/s1riysss)
 [![Discord](https://img.shields.io/badge/-Discord-090909?style=for-the-badge&logo=discord)](https://discordapp.com/users/380736129361772548/)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
