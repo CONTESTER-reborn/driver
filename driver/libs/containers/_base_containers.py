@@ -5,20 +5,20 @@ import docker
 from docker.models.containers import Container, ExecResult
 
 from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
-from libs.containers.utils import ExecutionCommandBuilder
-from libs.containers.enums import DriverErrors
-
-from libs.containers.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
-from libs.containers.types import CompiledFileData, ProcessedExecutionResult, DriverErrorType
+from driver.libs.containers.utils import ExecutionCommandBuilder
+from driver.libs.enums import DriverErrors
+from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
+from driver.libs.types import CompiledFileData, ProcessedExecutionResult
 
 client = docker.from_env()
 
 
 class _BaseContainer(ABC):
     """Base class of all containers for programming languages"""
+
     def __init__(self, time_limit: int, memory_limit: str):
         """
-        :param time_limit: Integer value that represents how many seconds can be spent on a single code execution
+        :param time_limit: Integer message that represents how many seconds can be spent on a single code execution
         :param memory_limit: String with a units identification char (100000b, 1000k, 128m, 1g).
                              If a string is specified without a units character,
                              bytes are assumed as an intended unit
@@ -59,8 +59,7 @@ class _BaseContainer(ABC):
     def __process_output(output: str) -> t.Tuple[str, float]:
         """Separates actual output from execution time"""
         actual_output, execution_time, _ = output.rsplit('\n', 2)
-        execution_time = float(execution_time)
-        return actual_output, execution_time
+        return actual_output, float(execution_time)
 
     def _process_execution_result(
             self,
@@ -73,11 +72,11 @@ class _BaseContainer(ABC):
         :raises ValueError: If both `execution_result` and `compilation_result` are None
         """
 
-        # Key - exit code, value - `DriverErrorType`
-        exit_code_error_map: t.Mapping[int, DriverErrorType] = {
-            1: DriverErrorType(DriverErrors.RUNTIME_ERROR, show_output=True),
-            9: DriverErrorType(DriverErrors.MEMORY_LIMIT_EXCEEDED, show_output=False),
-            15: DriverErrorType(DriverErrors.TIME_LIMIT_EXCEEDED, show_output=False)
+        # Key - exit code, message - `DriverErrorType`
+        exit_code_error_map: t.Mapping[int, DriverErrors] = {
+            1: DriverErrors.RUNTIME_ERROR,
+            9: DriverErrors.MEMORY_LIMIT_EXCEEDED,
+            15: DriverErrors.TIME_LIMIT_EXCEEDED
         }
 
         # Checking if there are any results of compilation
@@ -88,7 +87,7 @@ class _BaseContainer(ABC):
                     exit_code=compilation_result.exit_code,
                     output=compilation_result.output.decode('utf-8'),
                     execution_time=0,
-                    error_type=DriverErrors.COMPILATION_ERROR.value
+                    error_message=DriverErrors.COMPILATION_ERROR.value.message
                 )
 
         # Checking if there are any results of execution
@@ -100,19 +99,19 @@ class _BaseContainer(ABC):
             if execution_result.exit_code == 0:
                 error_message = ''
             else:
-                default_error_message = DriverErrors.UNKNOWN_ERROR.value
-                error_type = exit_code_error_map.get(execution_result.exit_code, default_error_message)
-                error_message = error_type.value
+                default_error = DriverErrors.UNKNOWN_ERROR
+                error_data = exit_code_error_map.get(execution_result.exit_code, default_error)
+                error_message = error_data.value.message
 
                 # If this error implies that output must be hidden, setting output as empty string
-                if not error_type.show_output:
+                if not error_data.value.show_output:
                     actual_output = ''
 
             return ProcessedExecutionResult(
                 exit_code=execution_result.exit_code,
                 output=actual_output,
                 execution_time=execution_time,
-                error_type=error_message
+                error_message=error_message
             )
 
         raise ValueError('There must be at least one argument that is not None')
@@ -167,8 +166,8 @@ class CompiledContainer(_BaseContainer, ABC):
 
     def __init__(self, time_limit: int, memory_limit: str):
         super().__init__(time_limit, memory_limit)
-        # Key - original name of file, value name of compiled file
-        self.__compiled_files_data: t.Mapping[Filename, CompiledFileData] = {}
+        # Key - original name of file, message name of compiled file
+        self.__compiled_files_data: t.Dict[Filename, CompiledFileData] = {}
 
     @abstractmethod
     def _build_code_compilation_command(self, filename: Filename) -> t.Tuple[ExecutableCommand, Filename]:
@@ -192,7 +191,7 @@ class CompiledContainer(_BaseContainer, ABC):
             self.__compiled_files_data[options.filename] = data
 
         # Checking if compilation failed
-        compiled_file_data = self.__compiled_files_data.get(options.filename)
+        compiled_file_data = self.__compiled_files_data[options.filename]
         if compiled_file_data.compilation_result.exit_code != 0:
             return self._process_execution_result(compilation_result=compilation_result)
 

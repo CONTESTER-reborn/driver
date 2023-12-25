@@ -1,4 +1,4 @@
-from libs.containers.types import ExecutableCommand
+from driver.libs.types import ExecutableCommand
 
 
 class ExecutionCommandBuilder:
