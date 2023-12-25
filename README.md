@@ -17,17 +17,66 @@
 
 **CONTESTER.Driver** - is a Docker-based system that runs students' code written on different programming languages.
 
-Avaliable programming languages:
+#### 🐍 Avaliable programming languages:
 * Python (Python 3.8)
     * PyPy 7.3.12
 * C++ (GCC Latest)
 * PascalABC (Free Pascal 3.2.2)
+
+#### 🤔 How it works?
+Every time user wants to execute some code. `Driver` creates appropriate file and Docker container. 
+Then depending on programming language type (compiled of interpreted) it executes all necessary commands.
+
+In order to create a file context manager `FileCreator` is invoked. Based on programming language type it will
+create file with unique name and proper extension. Note that after a file is no more needed it is deleted automatically.
+
+
+Now, let's take a look at how `Driver` deals with C++:
+Once again, depending on programming language type `Driver` will create `Container`. `Container` is a class 
+inherited either from `CompiledContainer` or `InterpretedContainer`. It implements only those methods, that do 
+something very language specific, for example return compilation or execution command.
+ 
+First of all, source code has to be compiled. To do this, `Driver` will run the following command:
+```shell script
+g++ user-scripts-dir/source-file.cpp -o compiled-files-dir/sourse-file-compiled
+```
+As a result, there is *sourse-file-compiled* in  a *compiled-files-dir*. Now, compiled file can be executed:
+```shell script
+sh -c 'echo -e "7 8" | time -f "%e" -o time-stdout-file timeout 2 compiled-files-dir/sourse-file-compiled && cat time-stdout-file'
+```
+Here are some explanations of this long command:
+* `7 8` is input of the program.
+* `time -f "%e" -o time-stdout-file` saves execution time in *time-stdout-file*
+* `timeout 2 compiled-files-dir/sourse-file-compiled` ensures that the program is limited to 2 seconds in this case
+* `&& cat time-stdout-file`: if no error has occurred, execution time goes to the last line of stdout
+
+After execution of this command, `Driver` will receive `ExecResult` with raw *exit code*, *stdout* and *stderr*.
+Then it will thoroughly process it and return uniform `ProcessedContainerExecutionResult` object.
+
+Examples:
+```python
+ProcessedContainerExecutionResult(exit_code=0, output='1\n2\n3', execution_time=0.06, error_message='')
+ProcessedContainerExecutionResult(
+    exit_code=1, 
+    output="""File "user-scripts-dir/62b16cbd-b2b7-44cb-8d35-7c4cf1ddd517.py", line 1
+    print(
+         ^
+SyntaxError: '(' was never closed
+Command exited with non-zero status 1""", 
+    execution_time=0, 
+    error_message='Run-Time Error'
+)
+```
+
+
 
 ## 👍 Contributing
 If you want to add new feature or suggest better solution for some aspect of this application,
 you can always create a new [Pull Request](https://github.com/CONTESTER-reborn/driver/pulls).
 In order to get a bug you noticed fixed create a [GitHub Issue](https://github.com/CONTESTER-reborn/driver/issues) 
 and we will discuss possible solutions.
+
+If you liked this repository, give it a 🌟 !
 
 
 ## 💬 Contacts
