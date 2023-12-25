@@ -4,11 +4,11 @@ from abc import ABC, abstractmethod
 import docker
 from docker.models.containers import Container, ExecResult
 
-from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
-from driver.libs.containers.utils import ExecutionCommandBuilder
-from driver.libs.enums import DriverErrors
+from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR, DOCKER_TIME_OUTPUT_FILE
+from driver.libs.enums import DriverError
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
-from driver.libs.types import CompiledFileData, ProcessedExecutionResult
+from driver.libs.types import CompiledFileData, ProcessedContainerExecutionResult
+from driver.libs.containers.result_processor import ResultProcessor
 
 client = docker.from_env()
 
@@ -51,73 +51,22 @@ class _BaseContainer(ABC):
         Wraps result of `_build_code_execution_command` in all other necessary commands
         (such as `time`, `timeout`, adds stdin pipe) via `ExecutionCommandBuilder`
         """
-        execution_command = self._build_code_execution_command(options.filename)
-        print(ExecutionCommandBuilder.build(execution_command, options.stdin, self.__time_limit))
-        return ExecutionCommandBuilder.build(execution_command, options.stdin, self.__time_limit)
+        command = self._build_code_execution_command(options.filename)
+        # Aliases
+        stdin = options.stdin
+        timeout = self.__time_limit
+        # Building full command
+        command_with_timeout = f'timeout {timeout} {command}'
+        command_with_time = f'time -f \"%e\" -o {DOCKER_TIME_OUTPUT_FILE} {command_with_timeout}'
+        command_with_time_output = f'{command_with_time} && cat {DOCKER_TIME_OUTPUT_FILE}'
+        command_wth_stdin = f'echo -e \"{stdin}\" | {command_with_time_output}'
+        full_command = f'sh -c \'{command_wth_stdin}\''
 
-    @staticmethod
-    def __process_output(output: str) -> t.Tuple[str, float]:
-        """Separates actual output from execution time"""
-        actual_output, execution_time, _ = output.rsplit('\n', 2)
-        return actual_output, float(execution_time)
-
-    def _process_execution_result(
-            self,
-            execution_result: t.Optional[ExecResult] = None,
-            compilation_result: t.Optional[ExecResult] = None
-    ) -> ProcessedExecutionResult:
-        """
-        Processes compilation and execution results and returns uniform response
-
-        :raises ValueError: If both `execution_result` and `compilation_result` are None
-        """
-
-        # Key - exit code, message - `DriverErrorType`
-        exit_code_error_map: t.Mapping[int, DriverErrors] = {
-            1: DriverErrors.RUNTIME_ERROR,
-            9: DriverErrors.MEMORY_LIMIT_EXCEEDED,
-            15: DriverErrors.TIME_LIMIT_EXCEEDED
-        }
-
-        # Checking if there are any results of compilation
-        if compilation_result is not None:
-            # Checking if compilation failed
-            if compilation_result.exit_code != 0:
-                return ProcessedExecutionResult(
-                    exit_code=compilation_result.exit_code,
-                    output=compilation_result.output.decode('utf-8'),
-                    execution_time=0,
-                    error_message=DriverErrors.COMPILATION_ERROR.value.message
-                )
-
-        # Checking if there are any results of execution
-        if execution_result is not None:
-            # Retrieving actual output and execution time
-            decoded_output = execution_result.output.decode('utf-8')
-            actual_output, execution_time = self.__process_output(decoded_output)
-
-            if execution_result.exit_code == 0:
-                error_message = ''
-            else:
-                default_error = DriverErrors.UNKNOWN_ERROR
-                error_data = exit_code_error_map.get(execution_result.exit_code, default_error)
-                error_message = error_data.value.message
-
-                # If this error implies that output must be hidden, setting output as empty string
-                if not error_data.value.show_output:
-                    actual_output = ''
-
-            return ProcessedExecutionResult(
-                exit_code=execution_result.exit_code,
-                output=actual_output,
-                execution_time=execution_time,
-                error_message=error_message
-            )
-
-        raise ValueError('There must be at least one argument that is not None')
+        print(full_command)
+        return full_command
 
     @abstractmethod
-    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedExecutionResult:
+    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedContainerExecutionResult:
         """Executes all the commands that are required to get results of passed program"""
         pass
 
@@ -135,8 +84,8 @@ class _BaseContainer(ABC):
 
         # Starting the container
         self._container.start()
-        # Creating directory with name from `DOCKER_COMPILED_FILES_DIR` variable
-        self._container.exec_run(f'mkdir {DOCKER_COMPILED_FILES_DIR}')
+        # Creating directory for compiled files and file for stdout of `time` command
+        self._container.exec_run(f'sh -c \'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -152,13 +101,15 @@ class InterpretedContainer(_BaseContainer, ABC):
     def __init__(self, time_limit: int, memory_limit: str):
         super().__init__(time_limit, memory_limit)
 
-    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedExecutionResult:
+    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedContainerExecutionResult:
         # Executing
         code_execution_command = self._build_full_code_execution_command(options)
-        execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True)
+        execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True, demux=True)
+        print(execution_result)
 
         # return execution_result
-        return self._process_execution_result(execution_result=execution_result)
+        result_processor = ResultProcessor(execution_result=execution_result)
+        return result_processor.process()
 
 
 class CompiledContainer(_BaseContainer, ABC):
@@ -178,7 +129,7 @@ class CompiledContainer(_BaseContainer, ABC):
         """
         pass
 
-    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedExecutionResult:
+    def execute(self, options: CodeExecutionCommandOptions) -> ProcessedContainerExecutionResult:
         # Checking if compilation is needed
         if options.filename not in self.__compiled_files_data.keys():
             # Compiling
@@ -193,12 +144,13 @@ class CompiledContainer(_BaseContainer, ABC):
         # Checking if compilation failed
         compiled_file_data = self.__compiled_files_data[options.filename]
         if compiled_file_data.compilation_result.exit_code != 0:
-            return self._process_execution_result(compilation_result=compilation_result)
+            result_processor = ResultProcessor(compilation_result=compilation_result)
+            return result_processor.process()
 
         # Executing
         execution_command_options = CodeExecutionCommandOptions(filename=compiled_filename, stdin=options.stdin)
         code_execution_command = self._build_full_code_execution_command(execution_command_options)
-        execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True)
+        execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True, demux=True)
 
-        # return execution_result
-        return self._process_execution_result(execution_result=execution_result, compilation_result=compilation_result)
+        result_processor = ResultProcessor(execution_result=execution_result, compilation_result=compilation_result)
+        return result_processor.process()

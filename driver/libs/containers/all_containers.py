@@ -2,6 +2,7 @@ import typing as t
 
 from config import DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
 from driver.libs.containers._base_containers import InterpretedContainer, CompiledContainer
+from driver.libs.files.utils import get_compiled_filename
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
 
 
@@ -38,11 +39,9 @@ class CppContainer(CompiledContainer):
         return 'frolvlad/alpine-gxx'
 
     def _build_code_compilation_command(self, filename: Filename) -> t.Tuple[ExecutableCommand, Filename]:
-        file, _ = filename.split('.')
-
-        compiled_file = f'{file}_compiled'
-        command = f'g++ {DOCKER_USER_SCRIPTS_DIR}/{filename} -o {DOCKER_COMPILED_FILES_DIR}/{compiled_file}'
-        return command, compiled_file
+        compiled_filename = get_compiled_filename(filename)
+        command = f'g++ {DOCKER_USER_SCRIPTS_DIR}/{filename} -o {DOCKER_COMPILED_FILES_DIR}/{compiled_filename}'
+        return command, compiled_filename
 
     def _build_code_execution_command(self, filename: Filename) -> ExecutableCommand:
         return f'{DOCKER_COMPILED_FILES_DIR}/{filename}'
@@ -57,9 +56,8 @@ class PascalABCContainer(CompiledContainer):
         return 'frolvlad/alpine-fpc:latest'
 
     def _build_code_compilation_command(self, filename: Filename) -> t.Tuple[ExecutableCommand, Filename]:
-        name, _ = filename.split('.')
-        compiled_filename = f'{name}_compiled'
-        command = f'fpc -o../{DOCKER_COMPILED_FILES_DIR}/{compiled_filename} {DOCKER_USER_SCRIPTS_DIR}/{filename}'
+        compiled_filename = get_compiled_filename(filename)
+        command = f'fpc -o./{DOCKER_COMPILED_FILES_DIR}/{compiled_filename} {DOCKER_USER_SCRIPTS_DIR}/{filename}'
         return command, compiled_filename
 
     def _build_code_execution_command(self, filename: Filename) -> ExecutableCommand:
