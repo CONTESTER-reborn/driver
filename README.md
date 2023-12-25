@@ -38,11 +38,11 @@ inherited either from `CompiledContainer` or `InterpretedContainer`. It implemen
 something very language specific, for example return compilation or execution command.
  
 First of all, source code has to be compiled. To do this, `Driver` will run the following command:
-```shell script
+```sh
 g++ user-scripts-dir/source-file.cpp -o compiled-files-dir/sourse-file-compiled
 ```
 As a result, there is *sourse-file-compiled* in  a *compiled-files-dir*. Now, compiled file can be executed:
-```shell script
+```sh
 sh -c 'echo -e "7 8" | time -f "%e" -o time-stdout-file timeout 2 compiled-files-dir/sourse-file-compiled && cat time-stdout-file'
 ```
 Here are some explanations of this long command:
@@ -69,6 +69,10 @@ Command exited with non-zero status 1""",
 )
 ```
 
+## 🛠️ Technologies
+* [![Python][Python-logo]][Python-link]
+* [![Docker][Docker-logo]][Docker-link]
+
 
 
 ## 👍 Contributing
@@ -89,3 +93,7 @@ My social medias:
 [![telegram](https://img.shields.io/badge/-Telegram-090909?style=for-the-badge&logo=Telegram&logoColor=4F7DB3)](https://t.me/s1riysss)
 [![Discord](https://img.shields.io/badge/-Discord-090909?style=for-the-badge&logo=discord)](https://discordapp.com/users/380736129361772548/)
 
+[Python-logo]: https://img.shields.io/badge/Python-white?style=for-the-badge&logo=python
+[Python-link]: https://www.python.org/
+[Docker-logo]: https://img.shields.io/badge/docker-white?style=for-the-badge&logo=Docker&logoColor=white&color=blue
+[Docker-link]: https://www.docker.com/
