@@ -8,10 +8,18 @@ class ProgrammingLanguages(Enum):
     CPP = ProgrammingLanguageData('GCC Latest', file_extension='cpp')
     PASCAL_ABC = ProgrammingLanguageData('Free Pascal 3.2.2', file_extension='pas')
 
+    @property
+    def value(self) -> ProgrammingLanguageData:
+        return super().value
+
 
 class DriverErrors(Enum):
     TIME_LIMIT_EXCEEDED = DriverErrorData('Time Limit Exceeded', show_output=False)
     MEMORY_LIMIT_EXCEEDED = DriverErrorData('Memory Limit Exceeded', show_output=False)
     COMPILATION_ERROR = DriverErrorData('Compilation Error', show_output=True)
     RUNTIME_ERROR = DriverErrorData('Run-Time Error', show_output=True)
-    UNKNOWN_ERROR: DriverErrorData = DriverErrorData('Unknown Error', show_output=False)
+    UNKNOWN_ERROR = DriverErrorData('Unknown Error', show_output=False)
+
+    @property
+    def value(self) -> DriverErrorData:
+        return super().value
