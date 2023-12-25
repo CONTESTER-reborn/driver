@@ -19,7 +19,7 @@
 
 ### 🐍 Avaliable programming languages:
 * Python (Python 3.8)
-    * PyPy 7.3.12
+    * PyPy (7.3.12)
 * C++ (GCC Latest)
 * PascalABC (Free Pascal 3.2.2)
 
