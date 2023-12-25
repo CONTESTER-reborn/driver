@@ -32,6 +32,7 @@ create file with unique name and proper extension. Note that after a file is no 
 
 
 Now, let's take a look at how `Driver` deals with C++:
+
 Once again, depending on programming language type `Driver` will create `Container`. `Container` is a class 
 inherited either from `CompiledContainer` or `InterpretedContainer`. It implements only those methods, that do 
 something very language specific, for example return compilation or execution command.
