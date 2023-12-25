@@ -49,11 +49,11 @@ Now, let's take a look at how `Driver` deals with source file with **C++**  code
 Here are some explanations of this long command:
 * `7 8` is input of the program.
 * `time -f "%e" -o time-stdout-file` saves execution time in *time-stdout-file*
-* `timeout 2 compiled-files-dir/sourse-file-compiled` ensures that the program is limited to 2 seconds in this case
-* `&& cat time-stdout-file`: if no error has occurred, execution time goes to the last line of stdout
+* `timeout 2 compiled-files-dir/sourse-file-compiled` ensures that the program is limited to 2 seconds
+* `&& cat time-stdout-file`: If no error has occurred, execution time goes to the last line of stdout
 
 After execution of this command, `Driver` will receive `ExecResult` with raw *exit code*, *stdout* and *stderr*.
-Then it will thoroughly process it and return uniform `ProcessedContainerExecutionResult` object.
+Then it will thoroughly process this result and return uniform `ProcessedContainerExecutionResult` object.
 
 Examples:
 ```python
