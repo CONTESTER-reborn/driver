@@ -10,7 +10,7 @@ class CodeExecutionCommandOptions:
 
 
 @dataclass
-class ProcessedExecutionResult:
+class ProcessedContainerExecutionResult:
     exit_code: int
     output: str
     execution_time: float

@@ -5,5 +5,5 @@ from dataclasses import dataclass
 class DriverErrorData:
     # Human readable error message (e.g. "Time Limit Exceeded")
     message: str
-    # In case of error, determines whether output will be shown (returned)
+    # In case of error, determines whether stdout will be shown (returned)
     show_output: bool
