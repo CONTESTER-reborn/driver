@@ -57,7 +57,7 @@ class PascalABCContainer(CompiledContainer):
 
     def _build_code_compilation_command(self, filename: Filename) -> t.Tuple[ExecutableCommand, Filename]:
         compiled_filename = get_compiled_filename(filename)
-        command = f'fpc -o~/{DOCKER_COMPILED_FILES_DIR}/{compiled_filename} {DOCKER_USER_SCRIPTS_DIR}/{filename}'
+        command = f'fpc -o./{DOCKER_COMPILED_FILES_DIR}/{compiled_filename} {DOCKER_USER_SCRIPTS_DIR}/{filename}'
         return command, compiled_filename
 
     def _build_code_execution_command(self, filename: Filename) -> ExecutableCommand:
