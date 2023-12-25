@@ -5,7 +5,7 @@ import docker
 from docker.models.containers import Container, ExecResult
 
 from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR, DOCKER_TIME_OUTPUT_FILE
-from driver.libs.enums import DriverErrors
+from driver.libs.enums import DriverError
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
 from driver.libs.types import CompiledFileData, ProcessedExecutionResult
 
@@ -82,10 +82,10 @@ class _BaseContainer(ABC):
         """
 
         # Key - exit code, message - `DriverErrorType`
-        exit_code_error_map: t.Mapping[int, DriverErrors] = {
-            1: DriverErrors.RUNTIME_ERROR,
-            9: DriverErrors.MEMORY_LIMIT_EXCEEDED,
-            15: DriverErrors.TIME_LIMIT_EXCEEDED
+        exit_code_error_map: t.Mapping[int, DriverError] = {
+            1: DriverError.RUNTIME_ERROR,
+            9: DriverError.MEMORY_LIMIT_EXCEEDED,
+            15: DriverError.TIME_LIMIT_EXCEEDED
         }
 
         # Checking if there are any results of compilation
@@ -96,7 +96,7 @@ class _BaseContainer(ABC):
                     exit_code=compilation_result.exit_code,
                     output=compilation_result.output.decode('utf-8'),
                     execution_time=0,
-                    error_message=DriverErrors.COMPILATION_ERROR.value.message
+                    error_message=DriverError.COMPILATION_ERROR.value.message
                 )
 
         # Checking if there are any results of execution
@@ -108,7 +108,7 @@ class _BaseContainer(ABC):
             if execution_result.exit_code == 0:
                 error_message = ''
             else:
-                default_error = DriverErrors.UNKNOWN_ERROR
+                default_error = DriverError.UNKNOWN_ERROR
                 error_data = exit_code_error_map.get(execution_result.exit_code, default_error)
                 error_message = error_data.value.message
 
