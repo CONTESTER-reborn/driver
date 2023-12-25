@@ -70,6 +70,10 @@ Command exited with non-zero status 1""",
 )
 ```
 
+More details about all those mechanisms can be found in the [source code](https://github.com/CONTESTER-reborn/driver/tree/master/driver/libs). 
+
+✅ The vast majority of methods are documented.
+
 
 ## 🛠️ Technologies
 * [![Python][Python-logo]][Python-link]
