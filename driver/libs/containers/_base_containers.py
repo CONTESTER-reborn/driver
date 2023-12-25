@@ -108,8 +108,7 @@ class _BaseContainer(ABC):
             if execution_result.exit_code == 0:
                 error_message = ''
             else:
-                default_error = DriverError.UNKNOWN_ERROR
-                error_data = exit_code_error_map.get(execution_result.exit_code, default_error)
+                error_data = exit_code_error_map.get(execution_result.exit_code, DriverError.UNKNOWN_ERROR)
                 error_message = error_data.value.message
 
                 # If this error implies that output must be hidden, setting output as empty string
@@ -145,7 +144,7 @@ class _BaseContainer(ABC):
         # Starting the container
         self._container.start()
         # Creating directory for compiled files and file for output of `time` command
-        self._container.exec_run(f'sh -c\'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
+        self._container.exec_run(f'sh -c \'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
