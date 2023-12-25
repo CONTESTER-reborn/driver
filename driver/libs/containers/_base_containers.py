@@ -4,8 +4,7 @@ from abc import ABC, abstractmethod
 import docker
 from docker.models.containers import Container, ExecResult
 
-from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
-from driver.libs.containers.utils import ExecutionCommandBuilder
+from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR, DOCKER_TIME_OUTPUT_FILE
 from driver.libs.enums import DriverErrors
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
 from driver.libs.types import CompiledFileData, ProcessedExecutionResult
@@ -51,13 +50,24 @@ class _BaseContainer(ABC):
         Wraps result of `_build_code_execution_command` in all other necessary commands
         (such as `time`, `timeout`, adds stdin pipe) via `ExecutionCommandBuilder`
         """
-        execution_command = self._build_code_execution_command(options.filename)
-        print(ExecutionCommandBuilder.build(execution_command, options.stdin, self.__time_limit))
-        return ExecutionCommandBuilder.build(execution_command, options.stdin, self.__time_limit)
+        command = self._build_code_execution_command(options.filename)
+        # Aliases
+        stdin = options.stdin
+        timeout = self.__time_limit
+        # Building full command
+        command_with_timeout = f'timeout {timeout} {command}'
+        command_with_time = f'time -f \"%e\" -o {DOCKER_TIME_OUTPUT_FILE} {command_with_timeout}'
+        command_with_time_output = f'{command_with_time} && cat {DOCKER_TIME_OUTPUT_FILE}'
+        command_wth_stdin = f'echo -e \"{stdin}\" | {command_with_time_output}'
+        full_command = f'sh -c \'{command_wth_stdin}\''
+
+        print(full_command)
+        return full_command
 
     @staticmethod
     def __process_output(output: str) -> t.Tuple[str, float]:
         """Separates actual output from execution time"""
+        print(output)
         actual_output, execution_time, _ = output.rsplit('\n', 2)
         return actual_output, float(execution_time)
 
@@ -135,15 +145,15 @@ class _BaseContainer(ABC):
 
         # Starting the container
         self._container.start()
-        # Creating directory with name from `DOCKER_COMPILED_FILES_DIR` variable
-        self._container.exec_run(f'mkdir {DOCKER_COMPILED_FILES_DIR}')
+        # Creating directory for compiled files and file for output of `time` command
+        self._container.exec_run(f'sh -c\'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Stopping and deleting container
-        self._container.kill()
-        self._container.remove()
-        # pass
+        # self._container.kill()
+        # self._container.remove()
+        pass
 
 
 class InterpretedContainer(_BaseContainer, ABC):
