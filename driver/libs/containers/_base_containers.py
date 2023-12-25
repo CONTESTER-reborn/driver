@@ -67,7 +67,6 @@ class _BaseContainer(ABC):
     @staticmethod
     def __process_output(output: str) -> t.Tuple[str, float]:
         """Separates actual output from execution time"""
-        print(output)
         actual_output, execution_time, _ = output.rsplit('\n', 2)
         return actual_output, float(execution_time)
 
@@ -151,9 +150,9 @@ class _BaseContainer(ABC):
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         # Stopping and deleting container
-        # self._container.kill()
-        # self._container.remove()
-        pass
+        self._container.kill()
+        self._container.remove()
+        # pass
 
 
 class InterpretedContainer(_BaseContainer, ABC):
