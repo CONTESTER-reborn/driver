@@ -17,13 +17,13 @@
 
 **CONTESTER.Driver** - is a Docker-based system that runs students' code written on different programming languages.
 
-#### 🐍 Avaliable programming languages:
+### 🐍 Avaliable programming languages:
 * Python (Python 3.8)
     * PyPy 7.3.12
 * C++ (GCC Latest)
 * PascalABC (Free Pascal 3.2.2)
 
-#### 🤔 How it works?
+### 🤔 How it works?
 Every time user wants to execute some code. `Driver` creates appropriate file and Docker container. 
 Then depending on programming language type (compiled of interpreted) it executes all necessary commands.
 
