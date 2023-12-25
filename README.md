@@ -13,6 +13,7 @@
     </p>
 </div>
 
+
 ## 📝 About The Project
 
 **CONTESTER.Driver** - is a Docker-based system that runs students' code written on different programming languages.
@@ -24,27 +25,27 @@
 * PascalABC (Free Pascal 3.2.2)
 
 ### 🤔 How it works?
-Every time user wants to execute some code. `Driver` creates appropriate file and Docker container. 
-Then depending on programming language type (compiled of interpreted) it executes all necessary commands.
+Every time user wants to execute some code `Driver` creates appropriate file and Docker container. 
+Then, depending on programming language type (compiled of interpreted) it executes all necessary commands.
 
 In order to create a file context manager `FileCreator` is invoked. Based on programming language type it will
 create file with unique name and proper extension. Note that after a file is no more needed it is deleted automatically.
 
+As for Docker containers, once again, depending on programming language type `Driver` will create `Container`. 
+`Container` is a class inherited either from `CompiledContainer` or `InterpretedContainer`. 
+It implements only those methods, that do something very language specific, for example return compilation or execution command.
 
-Now, let's take a look at how `Driver` deals with C++:
-
-Once again, depending on programming language type `Driver` will create `Container`. `Container` is a class 
-inherited either from `CompiledContainer` or `InterpretedContainer`. It implements only those methods, that do 
-something very language specific, for example return compilation or execution command.
+Now, let's take a look at how `Driver` deals with source file with **C++**  code :
  
-First of all, source code has to be compiled. To do this, `Driver` will run the following command:
-```sh
-g++ user-scripts-dir/source-file.cpp -o compiled-files-dir/sourse-file-compiled
-```
-As a result, there is *sourse-file-compiled* in  a *compiled-files-dir*. Now, compiled file can be executed:
-```sh
-sh -c 'echo -e "7 8" | time -f "%e" -o time-stdout-file timeout 2 compiled-files-dir/sourse-file-compiled && cat time-stdout-file'
-```
+1. First of all, source code has to be compiled. To do this, `Driver` will run the following command:
+    ```sh
+    g++ user-scripts-dir/source-file.cpp -o compiled-files-dir/sourse-file-compiled
+    ```
+2. As a result, there is *sourse-file-compiled* in  a *compiled-files-dir*. Now, compiled file can be executed:
+    ```sh
+    sh -c 'echo -e "7 8" | time -f "%e" -o time-stdout-file timeout 2 compiled-files-dir/sourse-file-compiled && cat time-stdout-file'
+    ```
+  
 Here are some explanations of this long command:
 * `7 8` is input of the program.
 * `time -f "%e" -o time-stdout-file` saves execution time in *time-stdout-file*
@@ -69,10 +70,10 @@ Command exited with non-zero status 1""",
 )
 ```
 
+
 ## 🛠️ Technologies
 * [![Python][Python-logo]][Python-link]
 * [![Docker][Docker-logo]][Docker-link]
-
 
 
 ## 👍 Contributing
