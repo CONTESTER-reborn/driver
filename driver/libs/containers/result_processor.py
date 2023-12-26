@@ -11,7 +11,6 @@ _Stream = t.Optional[bytes]
 class ResultProcessor:
     def __init__(self):
         self.EXIT_CODE_TO_ERROR_MAP: t.Mapping[int, DriverError] = {
-            1: DriverError.RUNTIME_ERROR,
             9: DriverError.MEMORY_LIMIT_EXCEEDED,
             15: DriverError.TIME_LIMIT_EXCEEDED
         }
@@ -69,7 +68,7 @@ class ResultProcessor:
             execution_time = 0
 
             # Error message and output
-            error_data = self.EXIT_CODE_TO_ERROR_MAP.get(execution_result.exit_code, DriverError.UNKNOWN_ERROR)
+            error_data = self.EXIT_CODE_TO_ERROR_MAP.get(execution_result.exit_code, DriverError.RUNTIME_ERROR)
             error_message = error_data.value.message
             # Setting output as value from stderr
             output = stderr
@@ -83,12 +82,3 @@ class ResultProcessor:
             execution_time=execution_time,
             error_message=error_message
         )
-
-    def process(self) -> ProcessedContainerExecutionResult:
-        if self.__compilation_result:
-            processed_compilation_result = self.__handle_compilation()
-            # If we got some kind of result after handling compilation, returning it
-            if processed_compilation_result:
-                return processed_compilation_result
-
-        return self.__handle_execution()

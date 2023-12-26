@@ -56,6 +56,7 @@ class _BaseContainer(ABC):
         stdin = options.stdin
         timeout = self.__time_limit
         # Building full command
+        # TODO: enforce "\n" character before redirecting file with execution time to stdout to avoid std::cout << "a" (without linebreak)
         command_with_timeout = f'timeout {timeout} {command}'
         command_with_time = f'time -f \"%e\" -o {DOCKER_TIME_OUTPUT_FILE} {command_with_timeout}'
         command_with_time_output = f'{command_with_time} && cat {DOCKER_TIME_OUTPUT_FILE}'
@@ -70,7 +71,7 @@ class _BaseContainer(ABC):
         """Executes all the commands that are required to get results of passed program"""
         pass
 
-    def __enter__(self):
+    def __enter__(self) -> "_BaseContainer":
         # Read-only volume with users' scripts
         scripts_volume = f'{LOCAL_USER_SCRIPTS_DIR}:/{DOCKER_USER_SCRIPTS_DIR}:ro'
 
@@ -88,7 +89,7 @@ class _BaseContainer(ABC):
         self._container.exec_run(f'sh -c \'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         # Stopping and deleting container
         self._container.kill()
         self._container.remove()
@@ -135,7 +136,7 @@ class CompiledContainer(_BaseContainer, ABC):
             # Compiling
             code_compilation_command, compiled_filename = self._build_code_compilation_command(options.filename)
             print(code_compilation_command)
-            compilation_result = self._container.exec_run(cmd=code_compilation_command)
+            compilation_result = self._container.exec_run(cmd=code_compilation_command, demux=True)
 
             # Saving data of compilation to `__compiled_files` hashmap
             data = CompiledFileData(filename=compiled_filename, compilation_result=compilation_result)
@@ -145,14 +146,17 @@ class CompiledContainer(_BaseContainer, ABC):
         compiled_file_data = self.__compiled_files_data[options.filename]
         if compiled_file_data.compilation_result.exit_code != 0:
             # Processing
-            result_processor = ResultProcessor(compilation_result=compilation_result)
+            result_processor = ResultProcessor()
             return result_processor.handle_compilation(compiled_file_data.compilation_result)
 
         # Executing
-        execution_command_options = CodeExecutionCommandOptions(filename=compiled_filename, stdin=options.stdin)
+        execution_command_options = CodeExecutionCommandOptions(
+            filename=compiled_file_data.filename,
+            stdin=options.stdin
+        )
         code_execution_command = self._build_full_code_execution_command(execution_command_options)
         execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True, demux=True)
 
         # Processing result
-        result_processor = ResultProcessor(execution_result=execution_result, compilation_result=compilation_result)
+        result_processor = ResultProcessor()
         return result_processor.handle_execution(execution_result)
