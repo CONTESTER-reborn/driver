@@ -9,22 +9,7 @@ _Stream = t.Optional[bytes]
 
 
 class ResultProcessor:
-    def __init__(
-            self,
-            execution_result: t.Optional[DockerExecResult] = None,
-            compilation_result: t.Optional[DockerExecResult] = None
-    ):
-        """
-        :param execution_result: Result of code execution
-        :param compilation_result: Result of code compilation
-        :raises ValueError: If both `execution_result` and `compilation_result` are None
-        """
-        self.__execution_result = execution_result
-        self.__compilation_result = compilation_result
-
-        if self.__compilation_result is None and self.__execution_result is None:
-            raise ValueError('There must be at least one argument that is not None')
-
+    def __init__(self):
         self.EXIT_CODE_TO_ERROR_MAP: t.Mapping[int, DriverError] = {
             1: DriverError.RUNTIME_ERROR,
             9: DriverError.MEMORY_LIMIT_EXCEEDED,
@@ -53,26 +38,30 @@ class ResultProcessor:
 
         return actual_output, float(execution_time)
 
-    def __handle_compilation(self) -> t.Optional[ProcessedContainerExecutionResult]:
-        # NOTE! compilation_result.stdout returns both stdout and stderr, since demux flag is set to True
-        stdout, stderr = self.__decode_streams(self.__compilation_result.stdout)
+    def handle_compilation(self, compilation_result: DockerExecResult) -> ProcessedContainerExecutionResult:
+        stdout, stderr = self.__decode_streams(compilation_result.output)
 
         # Checking if compilation failed
         if compilation_result.exit_code != 0:
             return ProcessedContainerExecutionResult(
-                exit_code=self.__compilation_result.exit_code,
+                exit_code=compilation_result.exit_code,
                 output=stderr,
                 execution_time=0,
                 error_message=DriverError.COMPILATION_ERROR.value.message
             )
-        return None
 
-    def __handle_execution(self) -> ProcessedContainerExecutionResult:
+        return ProcessedContainerExecutionResult(
+            exit_code=compilation_result.exit_code,
+            output='Success',
+            execution_time=0,
+            error_message=''
+        )
+
+    def handle_execution(self, execution_result: DockerExecResult) -> ProcessedContainerExecutionResult:
         # Retrieving actual stdout and execution time
-        # NOTE! execution_result.stdout returns both stdout and stderr, since demux flag is set to True
-        stdout, stderr = self.__decode_streams(self.__execution_result.stdout)
+        stdout, stderr = self.__decode_streams(execution_result.output)
 
-        if self.__execution_result.exit_code == 0:
+        if execution_result.exit_code == 0:
             output, execution_time = self.__process_stdout(stdout)
             error_message = ''
         else:
@@ -80,7 +69,7 @@ class ResultProcessor:
             execution_time = 0
 
             # Error message and output
-            error_data = self.EXIT_CODE_TO_ERROR_MAP.get(self.__execution_result.exit_code, DriverError.UNKNOWN_ERROR)
+            error_data = self.EXIT_CODE_TO_ERROR_MAP.get(execution_result.exit_code, DriverError.UNKNOWN_ERROR)
             error_message = error_data.value.message
             # Setting output as value from stderr
             output = stderr
@@ -89,7 +78,7 @@ class ResultProcessor:
                 output = ''
 
         return ProcessedContainerExecutionResult(
-            exit_code=self.__execution_result.exit_code,
+            exit_code=execution_result.exit_code,
             output=output,
             execution_time=execution_time,
             error_message=error_message

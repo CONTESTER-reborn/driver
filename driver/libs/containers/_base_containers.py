@@ -108,8 +108,8 @@ class InterpretedContainer(_BaseContainer, ABC):
         print(execution_result)
 
         # return execution_result
-        result_processor = ResultProcessor(execution_result=execution_result)
-        return result_processor.process()
+        result_processor = ResultProcessor()
+        return result_processor.handle_execution(execution_result)
 
 
 class CompiledContainer(_BaseContainer, ABC):
@@ -144,13 +144,15 @@ class CompiledContainer(_BaseContainer, ABC):
         # Checking if compilation failed
         compiled_file_data = self.__compiled_files_data[options.filename]
         if compiled_file_data.compilation_result.exit_code != 0:
+            # Processing
             result_processor = ResultProcessor(compilation_result=compilation_result)
-            return result_processor.process()
+            return result_processor.handle_compilation(compiled_file_data.compilation_result)
 
         # Executing
         execution_command_options = CodeExecutionCommandOptions(filename=compiled_filename, stdin=options.stdin)
         code_execution_command = self._build_full_code_execution_command(execution_command_options)
         execution_result = self._container.exec_run(cmd=code_execution_command, stdin=True, demux=True)
 
+        # Processing result
         result_processor = ResultProcessor(execution_result=execution_result, compilation_result=compilation_result)
-        return result_processor.process()
+        return result_processor.handle_execution(execution_result)
