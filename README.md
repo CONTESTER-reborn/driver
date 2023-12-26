@@ -81,6 +81,9 @@ More details about all those mechanisms can be found in the [source code](https:
 
 
 ## ⚡️ Quickstart
+> [!IMPORTANT]
+> If you don't have `Poetry` installed, please follow this [official guide](https://python-poetry.org/docs/#installation)
+
 1. Clone this project:
     ```shell
     git clone https://github.com/CONTESTER-reborn/driver.git
