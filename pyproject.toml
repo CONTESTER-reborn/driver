@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "driver"
+version = "0.1.0"
+description = "🐳 Docker-based system that runs code written on different programming languages"
+authors = ["Kirill Ankudinov <kirill.ankudinov.94@mail.ru>"]
+license = "MIT license"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+docker = "^7.0.0"
+
+[tool.poetry.group.dev.dependencies]
+mypy = "^1.8.0"
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
