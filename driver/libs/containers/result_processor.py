@@ -82,12 +82,3 @@ class ResultProcessor:
             execution_time=execution_time,
             error_message=error_message
         )
-
-    def process(self) -> ProcessedContainerExecutionResult:
-        if self.__compilation_result:
-            processed_compilation_result = self.__handle_compilation()
-            # If we got some kind of result after handling compilation, returning it
-            if processed_compilation_result:
-                return processed_compilation_result
-
-        return self.__handle_execution()
