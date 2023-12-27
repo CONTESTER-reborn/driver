@@ -111,8 +111,6 @@ class TestCompiledContainer(BaseCompiledTestContainer):
         result = self.run_source_code(code, container)
 
         assert result.exit_code != 0
-        # assert result.output != ''
-        # TODO: change behaviour when C++ run-time error occurs
         assert result.execution_time == 0
         assert result.error_message == DriverError.RUNTIME_ERROR.value.message
 
