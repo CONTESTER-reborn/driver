@@ -72,9 +72,13 @@ class _BaseContainer(ABC):
         pass
 
     def __enter__(self) -> "_BaseContainer":
+        # Read-only volume with users' scripts
+        scripts_volume = f'{LOCAL_USER_SCRIPTS_DIR}:/{DOCKER_USER_SCRIPTS_DIR}:ro'
+
         # Creating and starting the container
         self._container: Container = client.containers.create(
             image=self._docker_image,
+            volumes=[scripts_volume],
             mem_limit=self.__memory_limit,
             tty=True,
         )
@@ -82,9 +86,7 @@ class _BaseContainer(ABC):
         # Starting the container
         self._container.start()
         # Creating directory for compiled files and file for stdout of `time` command
-        self._container.exec_run(
-            f'sh -c \'mkdir {DOCKER_COMPILED_FILES_DIR} {DOCKER_USER_SCRIPTS_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\''
-        )
+        self._container.exec_run(f'sh -c \'mkdir {DOCKER_COMPILED_FILES_DIR} && touch {DOCKER_TIME_OUTPUT_FILE}\'')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:

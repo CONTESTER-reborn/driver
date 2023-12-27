@@ -3,7 +3,6 @@ import os
 import pytest
 
 from config import LOCAL_USER_SCRIPTS_DIR
-from driver.libs.containers import PythonContainer
 from driver.libs.files import FileCreator
 from driver.libs.files.utils import get_compiled_filename
 from driver.libs.enums import ProgrammingLanguage
@@ -12,22 +11,21 @@ from driver.libs.enums import ProgrammingLanguage
 def test_file_creator_context_menu():
     source_code = 'print(1)'
 
-    with PythonContainer(time_limit=1, memory_limit='64m') as container:
-        with FileCreator(source_code, ProgrammingLanguage.PYTHON, container) as file_creator:
-            path_to_file = LOCAL_USER_SCRIPTS_DIR / file_creator.filename
+    with FileCreator(source_code, ProgrammingLanguage.PYTHON) as file_creator:
+        path_to_file = LOCAL_USER_SCRIPTS_DIR / file_creator.filename
+        
+        # File should exist
+        assert os.path.exists(path_to_file)
+        # File should have correct extension
+        assert 'py' in file_creator.filename
 
-            # File should exist
-            assert os.path.exists(path_to_file)
-            # File should have correct extension
-            assert 'py' in file_creator.filename
+        with open(path_to_file) as created_file:
+            file_content = created_file.read()
+            # File should have correct content
+            assert file_content == source_code
 
-            with open(path_to_file) as created_file:
-                file_content = created_file.read()
-                # File should have correct content
-                assert file_content == source_code
-
-        # After exiting FileCreator context menu file should be deleted
-        assert not os.path.exists(path_to_file)
+    # After exiting FileCreator context menu file should be deleted
+    assert not os.path.exists(path_to_file)
 
 
 def test_get_compiled_filename():

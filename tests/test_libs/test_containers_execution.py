@@ -40,7 +40,7 @@ class BaseTestContainer(ABC):
         pass
 
     def run_source_code(self, source_code: str, container: _BaseContainer) -> ProcessedContainerExecutionResult:
-        with FileCreator(source_code, self._programming_language, container) as file_creator:
+        with FileCreator(source_code, self._programming_language) as file_creator:
             execution_options = CodeExecutionCommandOptions(filename=file_creator.filename, stdin='')
             return container.execute(execution_options)
 
