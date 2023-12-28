@@ -2,10 +2,9 @@ import typing as t
 from abc import ABC, abstractmethod
 
 import docker
-from docker.models.containers import Container, ExecResult
+from docker.models.containers import Container
 
-from config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR, DOCKER_TIME_OUTPUT_FILE
-from driver.libs.enums import DriverError
+from driver.config import LOCAL_USER_SCRIPTS_DIR, DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR, DOCKER_TIME_OUTPUT_FILE
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
 from driver.libs.types import CompiledFileData, ProcessedContainerExecutionResult
 from driver.libs.containers.result_processor import ResultProcessor

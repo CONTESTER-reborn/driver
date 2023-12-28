@@ -1,6 +1,6 @@
 import typing as t
 
-from config import DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
+from driver.config import DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
 from driver.libs.containers._base_containers import InterpretedContainer, CompiledContainer
 from driver.libs.files.utils import get_compiled_filename
 from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
