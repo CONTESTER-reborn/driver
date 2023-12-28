@@ -25,8 +25,6 @@ def execute(
         'pascal-abc': ProgrammingLanguage.PASCAL_ABC,
     }
 
-    print(source_code)
-
     response = []
 
     programming_language = languages_map[language]
@@ -37,5 +35,4 @@ def execute(
                 execution_options = CodeExecutionCommandOptions(filename=fc.filename, stdin=stdin)
                 result = container.execute(options=execution_options)
                 response.append(result)
-            print('Response is sent')
             return response
