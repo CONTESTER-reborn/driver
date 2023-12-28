@@ -1,9 +1,9 @@
 import os
 
 from driver.config import LOCAL_USER_SCRIPTS_DIR
+from driver.libs.enums import ProgrammingLanguage
 from driver.libs.files import FileCreator
 from driver.libs.files.utils import get_compiled_filename
-from driver.libs.enums import ProgrammingLanguage
 
 
 def test_file_creator_context_menu():
