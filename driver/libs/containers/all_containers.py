@@ -1,9 +1,9 @@
 import typing as t
 
-from driver.config import DOCKER_USER_SCRIPTS_DIR, DOCKER_COMPILED_FILES_DIR
-from driver.libs.containers._base_containers import InterpretedContainer, CompiledContainer
+from driver.config import DOCKER_COMPILED_FILES_DIR, DOCKER_USER_SCRIPTS_DIR
+from driver.libs.containers._base_containers import CompiledContainer, InterpretedContainer
 from driver.libs.files.utils import get_compiled_filename
-from driver.libs.types import Filename, ExecutableCommand, CodeExecutionCommandOptions
+from driver.libs.types import CodeExecutionCommandOptions, ExecutableCommand, Filename
 
 
 class PythonContainer(InterpretedContainer):

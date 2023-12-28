@@ -1,5 +1,6 @@
 from driver.libs.types import Filename
 
+
 def get_compiled_filename(original_filename: Filename, save_extension: bool = False) -> Filename:
     """
     Generates new name for compiled file based of original name

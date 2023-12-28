@@ -16,6 +16,33 @@ uvicorn = {extras = ["standard"], version = "^0.25.0"}
 mypy = "^1.8.0"
 isort = "^5.13.2"
 pytest = "^7.4.3"
+flake8 = "^6.1.0"
+
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_output = 3
+skip_gitignore = true
+src_paths = ["driver"]
+
+[tool.mypy]
+mypy_path = "./driver"
+follow_imports = "silent"
+strict_optional = true
+disallow_any_generics = true
+check_untyped_defs = true
+implicit_reexport = true
+ignore_missing_imports = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
 
 [build-system]
 requires = ["poetry-core"]

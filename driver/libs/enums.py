@@ -1,5 +1,6 @@
 from enum import Enum
-from .types import ProgrammingLanguageData, DriverErrorData
+
+from .types import DriverErrorData, ProgrammingLanguageData
 
 
 class ProgrammingLanguage(Enum):

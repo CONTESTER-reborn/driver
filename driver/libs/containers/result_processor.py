@@ -2,8 +2,8 @@ import typing as t
 
 from docker.models.containers import ExecResult as DockerExecResult
 
-from driver.libs.types import ProcessedContainerExecutionResult
 from driver.libs.enums import DriverError
+from driver.libs.types import ProcessedContainerExecutionResult
 
 _Stream = t.Optional[bytes]
 

@@ -1,9 +1,9 @@
 import os
 
 from driver.config import LOCAL_USER_SCRIPTS_DIR
+from driver.libs.enums import ProgrammingLanguage
 from driver.libs.files import FileCreator
 from driver.libs.files.utils import get_compiled_filename
-from driver.libs.enums import ProgrammingLanguage
 
 
 def test_file_creator_context_menu():
@@ -11,7 +11,7 @@ def test_file_creator_context_menu():
 
     with FileCreator(source_code, ProgrammingLanguage.PYTHON) as file_creator:
         path_to_file = LOCAL_USER_SCRIPTS_DIR / file_creator.filename
-        
+
         # File should exist
         assert os.path.exists(path_to_file)
         # File should have correct extension

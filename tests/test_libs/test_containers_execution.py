@@ -1,12 +1,11 @@
-import re
 from abc import ABC, abstractmethod
 
 import pytest
 
-from driver.libs.files import FileCreator
 from driver.libs.containers import ContainersFactory, _BaseContainer
+from driver.libs.enums import DriverError, ProgrammingLanguage
+from driver.libs.files import FileCreator
 from driver.libs.types import CodeExecutionCommandOptions, ProcessedContainerExecutionResult
-from driver.libs.enums import ProgrammingLanguage, DriverError
 
 
 class BaseTestContainer(ABC):
