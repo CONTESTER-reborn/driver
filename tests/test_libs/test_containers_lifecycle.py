@@ -1,5 +1,3 @@
-from time import sleep
-
 import pytest
 from docker import from_env
 
