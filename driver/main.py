@@ -12,10 +12,10 @@ app = FastAPI()
 
 @app.post("/execute")
 def execute(
-        language: str,
-        source_code: str,
-        time_limit: int,
-        memory_limit: str,
+        language: str = Query(),
+        source_code: str = Query(),
+        time_limit: int = Query(),
+        memory_limit: str = Query(),
         stdin_list: t.List[str] = Query()
 ) -> t.List[ProcessedContainerExecutionResult]:
     languages_map = {
