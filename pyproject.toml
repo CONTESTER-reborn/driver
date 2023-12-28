@@ -16,6 +16,7 @@ uvicorn = {extras = ["standard"], version = "^0.25.0"}
 mypy = "^1.8.0"
 isort = "^5.13.2"
 pytest = "^7.4.3"
+flake8 = "^6.1.0"
 
 [build-system]
 requires = ["poetry-core"]
