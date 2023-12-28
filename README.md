@@ -1,6 +1,7 @@
 <div id="readme-top"></div>
 
 [![CodeFactor Grade](https://img.shields.io/codefactor/grade/github/contester-reborn/driver/master?logo=codefactor&logoColor=959da5&label=Code%20Quality&labelColor=333a41&color=32cb55)](https://www.codefactor.io/repository/github/contester-reborn/driver)
+[![CI](https://github.com/contester-reborn/driver/actions/workflows/ci.yml/badge.svg?branch=master&style=flat)](https://github.com/contester-reborn/driver/actions/workflows/ci.yml)
 
 [//]: # (Project logo)
 <br/>
