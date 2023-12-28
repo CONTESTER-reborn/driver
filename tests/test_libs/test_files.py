@@ -1,8 +1,6 @@
 import os
 
-import pytest
-
-from config import LOCAL_USER_SCRIPTS_DIR
+from driver.config import LOCAL_USER_SCRIPTS_DIR
 from driver.libs.files import FileCreator
 from driver.libs.files.utils import get_compiled_filename
 from driver.libs.enums import ProgrammingLanguage

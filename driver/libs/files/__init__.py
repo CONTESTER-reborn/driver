@@ -4,7 +4,7 @@ import uuid
 
 from driver.libs.enums import ProgrammingLanguage
 from driver.libs.types import Filename
-from config import LOCAL_USER_SCRIPTS_DIR
+from driver.config import LOCAL_USER_SCRIPTS_DIR
 
 ProgrammingLanguagesMember = t.TypeVar('ProgrammingLanguagesMember', bound=ProgrammingLanguage)
 
