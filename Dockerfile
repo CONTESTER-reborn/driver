@@ -2,7 +2,7 @@ FROM python:3.10-alpine
 
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 
-RUN pip install poetry
+RUN pip install --no-cache-dir poetry
 
 WORKDIR /app
 COPY poetry.lock pyproject.toml /app/
