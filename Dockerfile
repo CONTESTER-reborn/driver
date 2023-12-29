@@ -11,3 +11,6 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-interaction
 
 COPY . /app
+
+EXPOSE 8000
+CMD ["uvicorn", "--host=0.0.0.0", "--port=8000", "driver.main:app"]
