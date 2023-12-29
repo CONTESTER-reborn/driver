@@ -59,3 +59,20 @@ jobs:
         run: poetry run isort . --check
       - name: Run mypy
         run: poetry run mypy .
+
+  docker-tests:
+    name: Docker tests
+    needs: [ code-quality ]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Build the project
+        run: docker compose up -d --build
+
+      - name: Run tests
+        run: docker compose exec -T driver poetry run python -m pytest
