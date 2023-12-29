@@ -4,8 +4,8 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
 # Volume with user scripts
-USER_SCRIPTS_VOLUME_PREFIX = 'driver' # Same as name of service in docker-compose
-USER_SCRIPTS_VOLUME_NAME = 'user-scripts-volume' # Same as name of volume in docker-compose
+USER_SCRIPTS_VOLUME_PREFIX = 'driver'  # Same as name of service in docker-compose
+USER_SCRIPTS_VOLUME_NAME = 'user-scripts-volume'  # Same as name of volume in docker-compose
 USER_SCRIPTS_VOLUME_FULLNAME = f'{USER_SCRIPTS_VOLUME_PREFIX}_{USER_SCRIPTS_VOLUME_NAME}'
 
 # Local files and folders

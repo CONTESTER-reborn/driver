@@ -6,11 +6,11 @@ import docker
 from docker.models.containers import Container
 
 from driver.config import (
-    USER_SCRIPTS_VOLUME_FULLNAME,
     DOCKER_COMPILED_FILES_DIR,
     DOCKER_TIME_OUTPUT_FILE,
     DOCKER_USER_SCRIPTS_DIR,
     LOCAL_USER_SCRIPTS_DIR,
+    USER_SCRIPTS_VOLUME_FULLNAME,
 )
 from driver.libs.containers.result_processor import ResultProcessor
 from driver.libs.types import (
