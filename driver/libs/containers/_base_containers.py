@@ -1,3 +1,4 @@
+import os
 import typing as t
 from abc import ABC, abstractmethod
 
@@ -5,6 +6,7 @@ import docker
 from docker.models.containers import Container
 
 from driver.config import (
+    USER_SCRIPTS_VOLUME_FULLNAME,
     DOCKER_COMPILED_FILES_DIR,
     DOCKER_TIME_OUTPUT_FILE,
     DOCKER_USER_SCRIPTS_DIR,
@@ -82,7 +84,12 @@ class _BaseContainer(ABC):
 
     def __enter__(self) -> "_BaseContainer":
         # Read-only volume with users' scripts
-        scripts_volume = f'{LOCAL_USER_SCRIPTS_DIR}:/{DOCKER_USER_SCRIPTS_DIR}:ro'
+        if os.environ.get('DOCKER_FLAG') == '1':
+            # Mounting volume
+            scripts_volume = f'{USER_SCRIPTS_VOLUME_FULLNAME}:/{DOCKER_USER_SCRIPTS_DIR}:ro'
+        else:
+            # Mounting directory
+            scripts_volume = f'{LOCAL_USER_SCRIPTS_DIR}:/{DOCKER_USER_SCRIPTS_DIR}:ro'
 
         # Creating and starting the container
         self._container: Container = client.containers.create(
@@ -90,6 +97,7 @@ class _BaseContainer(ABC):
             volumes=[scripts_volume],
             mem_limit=self.__memory_limit,
             tty=True,
+            detach=True,
         )
 
         # Starting the container
