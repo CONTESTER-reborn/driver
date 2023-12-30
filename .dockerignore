@@ -17,7 +17,7 @@
 **/charts
 **/docker-compose*
 **/compose*
-**/Dockerfile*
+docker-compose-test/docker-compose.common.yml
 **/node_modules
 **/npm-debug.log
 **/obj

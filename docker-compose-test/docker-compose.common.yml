@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  common-runner:
+    tty: true
+    volumes:
+      - user-scripts:/user-scripts-local/:ro
+    deploy:
+      endpoint_mode: dnsrr
+      resources:
+        limits:
+          memory: 128M
+
+volumes:
+  user-scripts:
