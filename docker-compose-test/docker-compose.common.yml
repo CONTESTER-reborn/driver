@@ -6,6 +6,10 @@ services:
       - user-scripts:/user-scripts-local/:ro
     deploy:
       endpoint_mode: dnsrr
+      restart_policy:
+        condition: on-failure
+        max_attempts: 3
+        window: 5s
       resources:
         limits:
           memory: 128M
