@@ -15,6 +15,7 @@ env:
 
 jobs:
   code-quality:
+    name: Code quality
     strategy:
       fail-fast: false
       matrix:
