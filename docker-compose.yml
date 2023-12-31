@@ -10,10 +10,9 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     ports:
       - "8000:8000"
-    env_file:
-      - .env
     environment:
       - DOCKER_FLAG=1
+      - LOCAL_USER_SCRIPTS_DIR=shared-user-scripts
 
 volumes:
   user-scripts-volume:
