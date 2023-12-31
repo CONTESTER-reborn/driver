@@ -74,5 +74,12 @@ jobs:
       - name: Build the project
         run: docker compose up -d --build
 
+      - name: Pull required Docker images
+        run: |
+          docker pull python:3.8-alpine
+          docker pull frolvlad/alpine-pypy
+          docker pull frolvlad/alpine-gxx
+          docker pull frolvlad/alpine-fpc:latest
+
       - name: Run tests
         run: docker compose exec -T driver poetry run python -m pytest
