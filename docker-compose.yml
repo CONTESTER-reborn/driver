@@ -12,6 +12,7 @@ services:
       - "8000:8000"
     environment:
       - DOCKER_FLAG=1
+      - LOCAL_USER_SCRIPTS_DIR=shared-user-scripts
 
 volumes:
   user-scripts-volume:
